@@ -1,0 +1,21 @@
+---
+services:
+  namenode:
+    image: bde2020/hadoop-namenode:{{ hadoop_image_tag }}
+    container_name: namenode
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      - CLUSTER_NAME={{ hdfs_cluster_name }}
+      - CORE_CONF_fs_defaultFS=hdfs://{{ hdfs_namenode_host }}:{{ hdfs_namenode_port }}
+      - HDFS_CONF_dfs_replication={{ hdfs_replication }}
+      - HDFS_CONF_dfs_permissions_enabled=false
+      - HDFS_CONF_dfs_namenode_name_dir=file:///hadoop/dfs/name
+      - HDFS_CONF_dfs_client_use_datanode_hostname=true
+      - HDFS_CONF_dfs_datanode_use_datanode_hostname=true
+    volumes:
+      - {{ hadoop_data_root }}/namenode:/hadoop/dfs/name
+    extra_hosts:
+{% for host in groups['cluster'] | sort %}
+      - "{{ host }}:{{ hostvars[host]['ansible_host'] }}"
+{% endfor %}

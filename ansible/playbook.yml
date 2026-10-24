@@ -1,0 +1,14 @@
+# Orquestador de Tareas que se van a ejecutar en las mv
+---
+- name: Configuración base y Docker del cluster
+  hosts: cluster
+  become: true #privilegio de administrador
+  roles:
+    - common
+    - docker
+
+- name: Desplegar HDFS
+  hosts: cluster
+  become: true
+  roles:
+    - hdfs

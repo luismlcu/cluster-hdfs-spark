@@ -1,0 +1,38 @@
+---
+- name: Crear directorio de datos del NameNode
+  ansible.builtin.file:
+    path: "{{ hadoop_data_root }}/namenode"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  when: inventory_hostname in groups['masters']
+
+- name: Crear directorio de datos del DataNode
+  ansible.builtin.file:
+    path: "{{ hadoop_data_root }}/datanode"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  when: inventory_hostname in groups['workers']
+
+- name: Desplegar docker-compose de HDFS
+  ansible.builtin.template:
+    src: "{{ 'namenode.j2' if inventory_hostname in groups['masters'] else 'datanode.j2' }}"
+    dest: "{{ hadoop_data_root }}/docker-compose.yml"
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Levantar los contenedores de HDFS
+  community.docker.docker_compose_v2:
+    project_src: "{{ hadoop_data_root }}"
+    state: present
+
+- name: Esperar a que el NameNode esté disponible
+  ansible.builtin.wait_for:
+    host: "{{ hdfs_namenode_host }}"
+    port: "{{ hdfs_namenode_web_port }}"
+    timeout: 300
+  when: inventory_hostname in groups['masters']

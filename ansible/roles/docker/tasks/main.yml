@@ -1,0 +1,42 @@
+---
+- name: Instalar dependencias 
+  ansible.builtin.apt:
+    name:
+      - ca-certificates
+      - curl
+      - gnupg
+    state: present
+    update_cache: true
+
+- name: Añadir clave GPG oficial de Docker
+  ansible.builtin.apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+
+- name: Añadir repositorio de Docker
+  ansible.builtin.apt_repository:
+    repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu jammy stable"
+    state: present
+
+- name: Instalar Docker CE, Compose y el SDK de Python
+  ansible.builtin.apt:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - docker-compose-plugin
+      - python3-docker
+    state: present
+    update_cache: true
+
+- name: Iniciar y habilitar Docker
+  ansible.builtin.systemd:
+    name: docker
+    state: started
+    enabled: true
+
+- name: Añadir el usuario vagrant al grupo docker
+  ansible.builtin.user:
+    name: vagrant
+    groups: docker
+    append: true

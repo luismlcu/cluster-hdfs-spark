@@ -1,0 +1,23 @@
+---
+services:
+  datanode:
+    image: bde2020/hadoop-datanode:{{ hadoop_image_tag }}
+    container_name: datanode
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      - CLUSTER_NAME={{ hdfs_cluster_name }}
+      - CORE_CONF_fs_defaultFS=hdfs://{{ hdfs_namenode_host }}:{{ hdfs_namenode_port }}
+      - HDFS_CONF_dfs_replication={{ hdfs_replication }}
+      - HDFS_CONF_dfs_permissions_enabled=false
+      - HDFS_CONF_dfs_datanode_data_dir=file:///hadoop/dfs/data
+      - HDFS_CONF_dfs_datanode_hostname={{ inventory_hostname }}
+      - HDFS_CONF_dfs_client_use_datanode_hostname=true
+      - HDFS_CONF_dfs_datanode_use_datanode_hostname=true
+      - SERVICE_PRECONDITION={{ hdfs_namenode_host }}:{{ hdfs_namenode_web_port }}
+    volumes:
+      - {{ hadoop_data_root }}/datanode:/hadoop/dfs/data
+    extra_hosts:
+{% for host in groups['cluster'] | sort %}
+      - "{{ host }}:{{ hostvars[host]['ansible_host'] }}"
+{% endfor %}

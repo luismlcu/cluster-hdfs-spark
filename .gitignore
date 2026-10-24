@@ -1,0 +1,10 @@
+# Archivos y claves de Vagrant
+.vagrant/
+apunte.md
+practica1.pdf
+repomix-output.xml
+
+# Archivos de respaldo o temporales
+*.log
+*.tmp
+.DS_Store

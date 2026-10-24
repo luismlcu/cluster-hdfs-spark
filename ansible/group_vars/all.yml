@@ -1,0 +1,20 @@
+---
+#Define variables globales que se usan en todas los nodos
+# HDFS
+hadoop_image_tag: "2.0.0-hadoop3.2.1-java8"
+hdfs_cluster_name: "bigdata"
+hdfs_namenode_host: "master"
+hdfs_namenode_port: 9000
+hdfs_namenode_web_port: 9870
+hdfs_datanode_web_port: 9864
+hdfs_replication: 2
+hadoop_data_root: "/opt/bigdata"
+
+# Spark (lo usaremos en el siguiente paso)
+spark_image_tag: "3.2.1-hadoop3.2"
+spark_master_host: "master"
+spark_master_port: 7077
+spark_master_web_port: 8080
+spark_worker_web_port: 8081
+spark_worker_memory: "1g"
+spark_worker_cores: 1

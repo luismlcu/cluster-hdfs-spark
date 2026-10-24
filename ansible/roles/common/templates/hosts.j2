@@ -1,0 +1,7 @@
+127.0.0.1 localhost
+::1 localhost ip6-localhost ip6-loopback
+
+# Cluster Big Data
+{% for host in groups['cluster'] | sort %}
+{{ hostvars[host]['ansible_host'] }} {{ host }}
+{% endfor %}
