@@ -3,6 +3,7 @@
 apunte.md
 practica1.pdf
 repomix-output.xml
+verify.sh
 
 # Archivos de respaldo o temporales
 *.log
