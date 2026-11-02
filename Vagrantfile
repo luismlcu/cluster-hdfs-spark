@@ -5,9 +5,9 @@ Vagrant.configure("2") do |config|
 
   #Definicion de nodos
   nodes = [
-    { name: "master",  ip: "192.168.56.10", ram: 3072, cpus: 2 },
-    { name: "worker1", ip: "192.168.56.11", ram: 2048, cpus: 2 },
-    { name: "worker2", ip: "192.168.56.12", ram: 2048, cpus: 2 }
+    { name: "master",  ip: "192.168.56.10", ram: 4096, cpus: 2 },
+    { name: "worker1", ip: "192.168.56.11", ram: 3072, cpus: 2 },
+    { name: "worker2", ip: "192.168.56.12", ram: 3072, cpus: 2 }
   ]
 
   # Definición de cada máquina virtual: nombre, hostname, IP privada, memoria RAM y CPU.

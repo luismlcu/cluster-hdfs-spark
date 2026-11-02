@@ -10,8 +10,9 @@ hdfs_datanode_web_port: 9864
 hdfs_replication: 2
 hadoop_data_root: "/opt/bigdata"
 
-# Spark (lo usaremos en el siguiente paso)
+# Spark
 spark_image_tag: "3.2.1-hadoop3.2"
+spark_root: "{{ hadoop_data_root }}/spark"
 spark_master_host: "master"
 spark_master_port: 7077
 spark_master_web_port: 8080

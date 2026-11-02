@@ -1,0 +1,8 @@
+# Gestionado por Ansible
+spark.master                                    spark://{{ spark_master_host }}:{{ spark_master_port }}
+
+# Acceso a HDFS. Un cliente HDFS usa SU propia replicación (por defecto 3), no la del NameNode:
+# sin esto Spark escribiría con 3 réplicas en un clúster de 2 DataNodes.
+spark.hadoop.fs.defaultFS                       hdfs://{{ hdfs_namenode_host }}:{{ hdfs_namenode_port }}
+spark.hadoop.dfs.replication                    {{ hdfs_replication }}
+spark.hadoop.dfs.client.use.datanode.hostname   true

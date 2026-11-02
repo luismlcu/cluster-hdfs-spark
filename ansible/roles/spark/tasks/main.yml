@@ -1,0 +1,61 @@
+---
+- name: Crear directorios de Spark
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  loop:
+    - "{{ spark_root }}"
+    - "{{ spark_root }}/jobs"
+
+- name: Desplegar la configuración por defecto de Spark (master, HDFS y replicación)
+  ansible.builtin.template:
+    src: spark-defaults.conf.j2
+    dest: "{{ spark_root }}/spark-defaults.conf"
+    owner: root
+    group: root
+    mode: "0644"
+  register: spark_defaults
+
+- name: Copiar el job de ejemplo (wordcount sobre HDFS) al master
+  ansible.builtin.copy:
+    src: wordcount.scala
+    dest: "{{ spark_root }}/jobs/wordcount.scala"
+    owner: root
+    group: root
+    mode: "0644"
+  when: inventory_hostname in groups['masters']
+
+- name: Desplegar docker-compose de Spark
+  ansible.builtin.template:
+    src: "{{ 'spark-master.j2' if inventory_hostname in groups['masters'] else 'spark-worker.j2' }}"
+    dest: "{{ spark_root }}/docker-compose.yml"
+    owner: root
+    group: root
+    mode: "0644"
+
+# Compose no detecta cambios en ficheros montados: si cambia spark-defaults.conf se recrean los contenedores.
+- name: Levantar los contenedores de Spark
+  community.docker.docker_compose_v2:
+    project_src: "{{ spark_root }}"
+    state: present
+    recreate: "{{ 'always' if spark_defaults is changed else 'auto' }}"
+
+- name: Esperar a que el Spark Master esté disponible
+  ansible.builtin.wait_for:
+    host: "{{ spark_master_host }}"
+    port: "{{ spark_master_web_port }}"
+    timeout: 300
+  when: inventory_hostname in groups['masters']
+
+- name: Verificar que todos los Spark Workers se han registrado en el Master
+  ansible.builtin.uri:
+    url: "http://{{ spark_master_host }}:{{ spark_master_web_port }}/json/"
+    return_content: true
+  register: spark_status
+  until: (spark_status.json | default({})).aliveworkers | default(0) | int == groups['workers'] | length
+  retries: 30
+  delay: 5
+  when: inventory_hostname in groups['masters']

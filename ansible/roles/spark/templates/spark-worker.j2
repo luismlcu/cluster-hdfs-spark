@@ -1,0 +1,19 @@
+---
+services:
+  spark-worker:
+    image: bde2020/spark-worker:{{ spark_image_tag }}
+    container_name: spark-worker
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      - ENABLE_INIT_DAEMON=false
+      - SPARK_MASTER=spark://{{ spark_master_host }}:{{ spark_master_port }}
+      - SPARK_WORKER_WEBUI_PORT={{ spark_worker_web_port }}
+      - SPARK_WORKER_MEMORY={{ spark_worker_memory }}
+      - SPARK_WORKER_CORES={{ spark_worker_cores }}
+    volumes:
+      - {{ spark_root }}/spark-defaults.conf:/spark/conf/spark-defaults.conf:ro
+    extra_hosts:
+{% for host in groups['cluster'] | sort %}
+      - "{{ host }}:{{ hostvars[host]['ansible_host'] }}"
+{% endfor %}
