@@ -1,0 +1,18 @@
+---
+services:
+  spark-master:
+    image: bde2020/spark-master:{{ spark_image_tag }}
+    container_name: spark-master
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      - ENABLE_INIT_DAEMON=false
+      - SPARK_MASTER_PORT={{ spark_master_port }}
+      - SPARK_MASTER_WEBUI_PORT={{ spark_master_web_port }}
+    volumes:
+      - {{ spark_root }}/spark-defaults.conf:/spark/conf/spark-defaults.conf:ro
+      - {{ spark_root }}/jobs:/jobs:ro
+    extra_hosts:
+{% for host in groups['cluster'] | sort %}
+      - "{{ host }}:{{ hostvars[host]['ansible_host'] }}"
+{% endfor %}

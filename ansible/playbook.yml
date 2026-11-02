@@ -12,3 +12,9 @@
   become: true
   roles:
     - hdfs
+
+- name: Desplegar Spark standalone
+  hosts: cluster
+  become: true
+  roles:
+    - spark
